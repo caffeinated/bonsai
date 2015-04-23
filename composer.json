@@ -1,6 +1,6 @@
 {
     "name": "caffeinated/bonsai",
-    "description": "Laravel 5 asset manager",
+    "description": "Asset management package for the Laravel 5 framework.",
     "keywords": ["bonsai", "laravel", "caffeinated"],
     "license": "MIT",
     "authors": [
