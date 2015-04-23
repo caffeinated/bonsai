@@ -1,0 +1,34 @@
+{
+    "name": "caffeinated/bonsai",
+    "description": "Laravel 5 asset manager",
+    "keywords": ["bonsai", "laravel", "caffeinated"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Shea Lewis",
+            "email": "shea.lewis89@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "illuminate/support": ">=5.0.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Caffeinated\\Bonsai\\": "src/Caffeinated/Bonsai/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Caffeinated\\Bonsai\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}
