@@ -34,19 +34,19 @@ class Bonsai
 	 * @param  string  $path
 	 * @return null
 	 */
-	public function plant($callback)
+	public function plant($callback = null)
 	{
+		$assets = new Assets;
+
 		if (is_callable($callback)) {
-			$assets = new Assets;
-
 			call_user_func($callback, $assets);
-
-			$this->collection->put('bonsai', $assets);
-
-			$this->view->share('bonsai', $assets);
-
-			return $assets;
 		}
+
+		$this->collection->put('bonsai', $assets);
+
+		$this->view->share('bonsai', $assets);
+
+		return $assets;
 	}
 
 	/**

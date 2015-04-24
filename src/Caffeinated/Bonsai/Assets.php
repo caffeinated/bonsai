@@ -27,6 +27,13 @@ class Assets
 	protected $jsRegex = '/.\.js$/i';
 
 	/**
+	 * Regex pattern to match Bonsai json files.
+	 *
+	 * @var string
+	 */
+	protected $bonsaiRegex = '/bonsai\.json$/i';
+
+	/**
 	 * @var Illuminate\Support\Collection
 	 */
 	protected $collection;
@@ -52,10 +59,10 @@ class Assets
 			foreach ($assets as $asset) {
 				$this->add($asset);
 			}
-		} elseif ($this->isJs($assets)) {
-			$this->addJs($assets);
-		} elseif ($this->isCss($assets)) {
-			$this->addCss($assets);
+		} elseif ($this->isAsset($assets)) {
+			$this->addAsset($assets);
+		} elseif ($this->isBonsai($assets)) {
+			$this->parseBonsai($assets);
 		}
 
 		return $this;
@@ -106,6 +113,17 @@ class Assets
 	}
 
 	/**
+	 * Determines if the passed asset is indeed an asset.
+	 *
+	 * @param  string  $asset
+	 * @return bool
+	 */
+	protected function isAsset($asset)
+	{
+		return preg_match($this->assetRegex, $asset);
+	}
+
+	/**
 	 * Determines if the passed asset is a Javascript file.
 	 *
 	 * @param  string  $asset
@@ -128,56 +146,55 @@ class Assets
 	}
 
 	/**
-	 * Add a CSS asset file.
+	 * Determines if the passed asset is a Bonsai JSON file.
+	 *
+	 * @param  string  $asset
+	 * @return bool
+	 */
+	protected function isBonsai($asset)
+	{
+		return preg_match($this->bonsaiRegex, $asset);
+	}
+
+	/**
+	 * Add an asset file to the collection.
 	 *
 	 * @param  array|string  $assets
-	 * @return Bonsai
+	 * @return Assets
 	 */
-	protected function addCss($assets)
+	protected function addAsset($assets)
 	{
 		if (is_array($assets)) {
 			foreach ($assets as $asset) {
-				$this->addCss($asset);
+				$this->addAsset($asset);
 			}
 
 			return $this;
 		}
 
-		$cssCollection = $this->collection->get('css');
+		$type       = ($this->isCss($assets)) ? 'css' : 'js';
+		$collection = $this->collection->get($type);
 
-		if (! in_array($assets, $cssCollection)) {
-			$cssCollection[] = $assets;
+		if (! in_array($assets, $collection)) {
+			$collection[] = $assets;
 
-			$this->collection->put('css', $cssCollection);
+			$this->collection->put($type, $collection);
 		}
 
 		return $this;
 	}
 
 	/**
-	 * Add a JS asset file.
+	 * Parse a bonsai.json file and add the assets to the collection.
 	 *
-	 * @param  array|string  $assets
-	 * @return Bonsai
+	 * @param  string  $path
+	 * @return Assets
 	 */
-	protected function addJs($assets)
+	protected function parseBonsai($path)
 	{
-		if (is_array($assets)) {
-			foreach ($assets as $asset) {
-				$this->addJs($asset);
-			}
+		$file   = file_get_contents($path);
+		$assets = json_decode($file);
 
-			return $this;
-		}
-
-		$jsCollection = $this->collection->get('js');
-
-		if (! in_array($assets, $jsCollection)) {
-			$jsCollection[] = $assets;
-
-			$this->collection->put('js', $jsCollection);
-		}
-
-		return $this;
+		return $this->addAsset($assets);
 	}
 }
