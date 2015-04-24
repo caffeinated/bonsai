@@ -50,25 +50,27 @@ class Bonsai
 	}
 
 	/**
-	 * Find and return the given bonsai collection.
+	 * Get and return the bonsai collection.
 	 *
-	 * @return Illuminate\Support\Collection
+	 * @return mixed
 	 */
 	public function get()
 	{
-		return $this->collection->get('bonsai');
+		return $this->collection->get('bonsai', null);
 	}
 
 	/**
 	 * Add assets to a pre-planted Bonsai collection.
 	 *
 	 * @param  array|string  $assets
-	 * @return Assets
+	 * @return mixed
 	 */
 	public function add($assets)
 	{
 		$bonsai = $this->get();
 
-		return $bonsai->add($assets);
+		if (! is_null($bonsai)) {
+			return $bonsai->add($assets);
+		}
 	}
 }
