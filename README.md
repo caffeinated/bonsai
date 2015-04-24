@@ -52,7 +52,7 @@ TODO
 ----
 - Check for dependencies (`dependsOn()` method) and load dependencies first, in order when rendering within a view.
 - Combine and minify assets into one cached file when in the production environment.
-- Add the ability to parse a bonsai.json file for assets that can be registered for use.
+- ~~Add the ability to parse a bonsai.json file for assets that can be registered for use.~~
 
 Quick Installation
 ------------------
