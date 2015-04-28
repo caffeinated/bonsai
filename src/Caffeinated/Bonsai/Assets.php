@@ -1,6 +1,7 @@
 <?php
 namespace Caffeinated\Bonsai;
 
+use Caffeinated\Bonsai\Dependencies;
 use Illuminate\Support\Collection;
 
 class Assets
@@ -111,8 +112,8 @@ class Assets
 		$cssCollection = $this->sortDependencies($this->collection->get('css'), 'css');
 		$output        = '';
 
-		foreach ($cssCollection as $css => $meta) {
-			$output .= '<link rel="stylesheet" href="'.$css.'">'."\n";
+		foreach ($cssCollection as $key => $value) {
+			$output .= '<link rel="stylesheet" href="'.$value.'">'."\n";
 		}
 
 		return $output;
@@ -128,8 +129,8 @@ class Assets
 		$jsCollection = $this->sortDependencies($this->collection->get('js'), 'js');
 		$output       = '';
 
-		foreach ($jsCollection as $js => $meta) {
-			$output .= '<script type="text/javascript" src="'.$js.'"></script>'."\n";
+		foreach ($jsCollection as $key => $value) {
+			$output .= '<script type="text/javascript" src="'.$value.'"></script>'."\n";
 		}
 
 		return $output;
@@ -200,7 +201,8 @@ class Assets
 
 		if (! in_array($assets, $collection)) {
 			$collection[$assets] = array(
-				'namespace' => $namespace
+				'namespace'  => $namespace,
+				'dependency' => array()
 			);
 
 			$this->collection->put($type, $collection);
@@ -245,25 +247,21 @@ class Assets
 	 */
 	protected function sortDependencies($assets = array(), $type)
 	{
-		$dependencies = array();
+		$dependencyList = array();
 
 		foreach ($assets as $key => $value) {
 			if (isset($value['dependency'])) {
-				$dependencies[$key] = $this->getNamespacedAsset($value['dependency'], $type);
+				$dependencyList[$key] = array($this->getNamespacedAsset($value['dependency'], $type));
 			} else {
-				$dependencies[$key] = null;
+				$dependencyList[$key] = null;
 			}
 		}
 
-		$hasCircularReferences = $this->hasCircularReferences($dependencies);
+		$dependencies = new Dependencies($dependencyList, true);
 
-		if (! $hasCircularReferences) {
-			array_multisort($dependencies, SORT_ASC, $assets);
-		} else {
-			throw new \Exception('Circular Reference Error.');
-		}
+		$sortedDependencies = $dependencies->sort();
 
-		return $assets;
+		return array_filter($sortedDependencies);
 	}
 
 	/**
