@@ -30,9 +30,25 @@ Now, to add assets at anytime (and anywhere in your code), simply call `Bonsai:a
 Bonsai::add('assets/css/example.css');
 ```
 
+### Defining Dependencies
+Assets may depend on other assets being loaded before them. You can easily tell Bonsai about any dependencies your asset files may have against each other by using the `dependsOn()` method.
+
+```php
+Bonsai::add('assets/css/example.css')->dependsOn('bootstrap');
+Bonsai::add('assets/css/bootstrap.css', 'bootstrap');
+```
+
+The above will generate the following CSS:
+
+```html
+<link rel="stylesheet" href="assets/css/bootstrap.css">
+<link rel="stylesheet" href="assets/css/example.css">
+```
+
+### Rendering Assets
 To echo out your assets within your layout, simply use the `css()` and `js()` methods:
 
-### Blade
+#### Blade
 
 ```html
 {!! $bonsai->css() !!}
@@ -40,7 +56,7 @@ To echo out your assets within your layout, simply use the `css()` and `js()` me
 {!! $bonsai->js() !!}
 ```
 
-### Twig
+#### Twig
 
 ```html
 {{ bonsai.css()|raw }}
@@ -50,7 +66,7 @@ To echo out your assets within your layout, simply use the `css()` and `js()` me
 
 TODO
 ----
-- Check for dependencies (`dependsOn()` method) and load dependencies first, in order when rendering within a view.
+- ~~Check for dependencies (`dependsOn()` method) and load dependencies first, in order when rendering within a view.~~
 - Combine and minify assets into one cached file when in the production environment.
 - ~~Add the ability to parse a bonsai.json file for assets that can be registered for use.~~
 
