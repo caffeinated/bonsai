@@ -1,6 +1,7 @@
 Caffeinated Bonsai
 ====================
-[![Laravel](https://img.shields.io/badge/Laravel-5.0-orange.svg?style=flat-square)](http://laravel.com)
+[![Laravel 5.0](https://img.shields.io/badge/Laravel-5.0-orange.svg?style=flat-square)](http://laravel.com)
+[![Laravel 5.1](https://img.shields.io/badge/Laravel-5.1-orange.svg?style=flat-square)](http://laravel.com)
 [![Source](http://img.shields.io/badge/source-caffeinated/bonsai-blue.svg?style=flat-square)](https://github.com/caffeinated/bonsai)
 [![License](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://tldrlegal.com/license/mit-license)
 
@@ -9,6 +10,46 @@ Caffeinated Bonsai
 Caffeinated Bonsai is an experimental project to handle and process assets for any Laravel 5 application - much like [CodeSleeve's Asset Pipeline](https://github.com/CodeSleeve/asset-pipeline) package provided for Laravel 4 (which is now deprecated due to Laravel Elixer in Laravel 5). **This package is under heavy development, and is not ready for any production use.**
 
 The package follows the FIG standards PSR-1, PSR-2, and PSR-4 to ensure a high level of interoperability between shared PHP code. At the moment the package is not unit tested, but is planned to be covered later down the road.
+
+Quick Installation
+------------------
+Begin by installing the package through Composer. Depending on what version of Laravel you are using (5.0 or 5.1), you'll want to pull in the `~1.0` or `~2.0` release, respectively:
+
+#### Laravel 5.0.x
+```
+composer require caffeinated/bonsai=~1.0
+```
+
+#### Laravel 5.1.x
+```
+composer require caffeinated/bonsai=~2.0
+```
+
+Once this operation is complete, simply add both the service provider and facade classes to your project's `config/app.php` file:
+
+#### Laravel 5.0.x
+##### Service Provider
+```php
+'Caffeinated\Bonsai\BonsaiServiceProvider',
+```
+
+##### Facade
+```php
+'Bonsai' => 'Caffeinated\Bonsai\Facades\Bonsai',
+```
+
+#### Laravel 5.1.x
+##### Service Provider
+```php
+Caffeinated\Bonsai\BonsaiServiceProvider::class,
+```
+
+##### Facade
+```php
+'Bonsai' => Caffeinated\Bonsai\Facades\Bonsai::class,
+```
+
+And that's it! With your coffee in reach, start planting some assets!
 
 Documentation
 -------------
@@ -69,29 +110,3 @@ TODO
 - ~~Check for dependencies (`dependsOn()` method) and load dependencies first, in order when rendering within a view.~~
 - Combine and minify assets into one cached file when in the production environment.
 - ~~Add the ability to parse a bonsai.json file for assets that can be registered for use.~~
-
-Quick Installation
-------------------
-Begin by installing the package through Composer. Add `caffeinated/bonsai` to your composer.json file:
-
-```
-"caffeinated/bonsai": "~1.0@dev"
-```
-
-Then run `composer update` to pull the package in.
-
-Once this operation is complete, simply add the service provider class and facade alias to your project's `config/app.php` file:
-
-#### Service Provider
-
-```php
-'Caffeinated\Bonsai\BonsaiServiceProvider',
-```
-
-#### Facade
-
-```php
-'Bonsai' => 'Caffeinated\Bonsai\Facades\Bonsai',
-```
-
-And that's it! With your coffee in reach, start planting some assets!
