@@ -7,7 +7,7 @@ Caffeinated Bonsai
 
 **Bonsai** (盆栽, lit. *plantings in tray*, from *bon*, a tray or low-sided pot and *sai*, a planting or plantings, is a Japanese art form using miniature trees grown in containers.
 
-Caffeinated Bonsai is an experimental project to handle and process assets for any Laravel 5 application - much like [CodeSleeve's Asset Pipeline](https://github.com/CodeSleeve/asset-pipeline) package provided for Laravel 4 (which is now deprecated due to Laravel Elixer in Laravel 5). **This package is under heavy development, and is not ready for any production use.**
+Caffeinated Bonsai is an experimental project to handle and process assets for any Laravel 5 application - much like [CodeSleeve's Asset Pipeline](https://github.com/CodeSleeve/asset-pipeline) package provided for Laravel 4 (which is now deprecated due to Laravel Elixer in Laravel 5).
 
 The package follows the FIG standards PSR-1, PSR-2, and PSR-4 to ensure a high level of interoperability between shared PHP code. At the moment the package is not unit tested, but is planned to be covered later down the road.
 
