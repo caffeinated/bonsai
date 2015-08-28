@@ -17,14 +17,15 @@
     "prefer-stable": true,
     "require": {
         "php": ">=5.5.9",
-        "caffeinated/beverage": "3.0.*"
+        "caffeinated/beverage": "3.0.*",
+        "kriswallsmith/assetic": "~1.2"
     },
     "require-dev": {
         "caffeinated/dev": "dev-master@dev"
     },
     "autoload": {
         "psr-4": {
-            "Caffeinated\\Bonsai\\": "src/Caffeinated/Bonsai/"
+            "Caffeinated\\Bonsai\\": "src/"
         }
     },
     "autoload-dev": {

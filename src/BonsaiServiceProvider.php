@@ -1,56 +1,30 @@
 <?php
+/**
+* Part of the Caffeinated PHP packages.
+*
+* MIT License and copyright information bundled with this package in the LICENSE file
+ */
 namespace Caffeinated\Bonsai;
 
-use Illuminate\Support\ServiceProvider;
+use Caffeinated\Beverage\ServiceProvider;
 
+/**
+ * This is the BonsaiServiceProvider.
+ *
+ * @package        Caffeinated\Bonsai
+ * @author         Caffeinated Dev Team
+ * @copyright      Copyright (c) 2015, Caffeinated
+ * @license        https://tldrlegal.com/license/mit-license MIT License
+ */
 class BonsaiServiceProvider extends ServiceProvider
 {
-	/**
-	 * Indicates if loading of the provider is deferred.
-	 *
-	 * @var bool
-	 */
-	protected $defer = false;
+    protected $dir = __DIR__;
 
-	/**
-	 * Perform post-registration booting of services.
-	 *
-	 * @return void
-	 */
-	public function boot()
-	{
-		//
-	}
+    protected $provides = [ 'bonsai' ];
 
-	/**
-	 * Register bindings in the container.
-	 *
-	 * @return void
-	 */
-	public function register()
-	{
-		$this->registerServices();
-	}
+    protected $bindings = [
+        'bonsai' => \Caffeinated\Bonsai\Bonsai::class
+    ];
 
-	/**
-	 * Register the package services.
-	 *
-	 * @return void
-	 */
-	protected function registerServices()
-	{
-		$this->app->bindShared('bonsai', function($app) {
-			return new Bonsai($app['view']);
-		});
-	}
 
-	/**
-	 * Get the services provided by the provider.
-	 *
-	 * @return array
-	 */
-	public function provides()
-	{
-		return ['bonsai'];
-	}
 }
