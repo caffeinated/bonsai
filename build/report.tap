@@ -1,0 +1,11 @@
+TAP version 13
+ok 1 - Caffeinated\Tests\Bonsai\AssetGroupTest::testAddsAndGetsAssets
+ok 2 - Caffeinated\Tests\Bonsai\AssetGroupTest::testCreatesAssetGroup
+ok 3 - Caffeinated\Tests\Bonsai\AssetGroupTest::testMeOk
+ok 4 - Caffeinated\Tests\Bonsai\BeverageServiceProviderTest::testConfigFiles
+ok 5 - Caffeinated\Tests\Bonsai\BeverageServiceProviderTest::testMeOk
+ok 6 - Caffeinated\Tests\Bonsai\BeverageServiceProviderTest::testIsAServiceProvider
+ok 7 - Caffeinated\Tests\Bonsai\BeverageServiceProviderTest::testProvides
+not ok 8 - Error: Caffeinated\Tests\Bonsai\FactoryTest::testSomething
+ok 9 - Caffeinated\Tests\Bonsai\FactoryTest::testMeOk
+1..9

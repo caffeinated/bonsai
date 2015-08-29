@@ -15,30 +15,13 @@ Quick Installation
 ------------------
 Begin by installing the package through Composer. Depending on what version of Laravel you are using (5.0 or 5.1), you'll want to pull in the `~1.0` or `~2.0` release, respectively:
 
-#### Laravel 5.0.x
-```
-composer require caffeinated/bonsai=~1.0
-```
-
 #### Laravel 5.1.x
-```
-composer require caffeinated/bonsai=~2.0
-```
 
-Once this operation is complete, simply add both the service provider and facade classes to your project's `config/app.php` file:
-
-#### Laravel 5.0.x
-##### Service Provider
-```php
-'Caffeinated\Bonsai\BonsaiServiceProvider',
+##### Composer
+```
+composer require caffeinated/bonsai=~3.0
 ```
 
-##### Facade
-```php
-'Bonsai' => 'Caffeinated\Bonsai\Facades\Bonsai',
-```
-
-#### Laravel 5.1.x
 ##### Service Provider
 ```php
 Caffeinated\Bonsai\BonsaiServiceProvider::class,
@@ -53,16 +36,22 @@ And that's it! With your coffee in reach, start planting some assets!
 
 Documentation
 -------------
-First, plant your bonsai. You may optionally register assets during this time as well.
 
+#### Bonsai
+The `Bonsai` facade returns the instance of `Caffeinated\Bonsai\Factory`.
+Instead of the facade you can also use dependency injection by type hinting the `Caffeinated\Bonsai\Contracts\Factory` interface.
+Alternatively you can use the IoC container's `make` method by either using the interface or alias `caffeinated.bonsai`.
+ 
+###### Method overview
+
+| method | paramters | description |
+|:-------|:----------|:------------|
+| `Bonsai::make($handle, $path, array $dependencies = [])` | (string) $handle = name/id, (string) $path = path to asset | Create and return a new asset instance |
+
+
+###### Simple examples
 ```php
-Bonsai::plant(function($asset) {
-	$asset->add('assets/css/bootstrap.css', 'bootstrap');
-	$asset->add('assets/css/test.css')->dependsOn('bootstrap');
-	$asset->add('assets/css/bootstrap.css', 'bootstrap');                // Duplicate assets will be caught and ignored.
-	$asset->add('assets/js/jquery.js', 'jquery');
-	$asset->add('assets/js/bootstrap.js', 'bootstrap')->dependsOn('jquery');
-});
+
 ```
 
 Now, to add assets at anytime (and anywhere in your code), simply call `Bonsai:add()`:

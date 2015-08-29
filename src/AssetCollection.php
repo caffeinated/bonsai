@@ -4,7 +4,7 @@
  *
  * MIT License and copyright information bundled with this package in the LICENSE file
  */
-namespace Caffeinated\Bonsai\Assets;
+namespace Caffeinated\Bonsai;
 
 use Assetic\Filter\HashableInterface;
 
@@ -22,9 +22,10 @@ class AssetCollection extends \Assetic\Asset\AssetCollection
     public function getCacheKey()
     {
         $key = '';
-        foreach($this->all() as $asset)
-        {
-            if(!$asset instanceof Asset) continue;
+        foreach ($this->all() as $asset) {
+        if (!$asset instanceof Asset) {
+                continue;
+        }
             $key .= $asset->getCacheKey();
         }
         return 'col_'.$key;

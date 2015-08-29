@@ -1,0 +1,14 @@
+
+
+Code Coverage Report:     
+  2015-08-29 04:52:09     
+                          
+ Summary:                 
+  Classes: 20.00% (2/10)  
+  Methods:  8.47% (5/59)  
+  Lines:    9.54% (29/304)
+
+\Caffeinated\Bonsai::AssetGroup
+  Methods:  23.08% ( 3/13)   Lines:  24.53% ( 26/106)
+\Caffeinated\Bonsai::BonsaiServiceProvider
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% (  3/  3)

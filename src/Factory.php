@@ -6,12 +6,11 @@
  */
 namespace Caffeinated\Bonsai;
 
-use Caffeinated\Beverage\Str;
-use Caffeinated\Bonsai\Contracts\Bonsai as BonsaiContract;
-use Caffeinated\Themes\Contracts\ThemeFactory;
+use Caffeinated\Bonsai\Contracts\Factory as FactoryContract;
+use Illuminate\Contracts\Config\Repository as Config;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Contracts\Routing\UrlGenerator;
-use Illuminate\Support\NamespacedItemResolver;
 
 /**
  * This is the Bonsai.
@@ -21,12 +20,8 @@ use Illuminate\Support\NamespacedItemResolver;
  * @copyright      Copyright (c) 2015, Caffeinated
  * @license        https://tldrlegal.com/license/mit-license MIT License
  */
-class Bonsai implements BonsaiContract
+class Factory implements FactoryContract
 {
-    /**
-     * @var \Laradic\Themes\ThemeFactory
-     */
-    protected $themes;
 
     /**
      * @var string
@@ -46,19 +41,65 @@ class Bonsai implements BonsaiContract
 
     protected $globalFilters = [ ];
 
+    /**
+     * @var \Illuminate\Contracts\Filesystem\Filesystem
+     */
     protected $files;
 
+    /**
+     * @var \Illuminate\Contracts\Routing\UrlGenerator
+     */
     protected $url;
+
+    /**
+     * @var \Illuminate\Contracts\Container\Container
+     */
+    protected $container;
+
+    /**
+     * @var \Collective\Html\HtmlBuilder
+     */
+    protected $html;
+
+    /**
+     * @var bool
+     */
+    protected $hasThemes;
+
+    /**
+     * @var \Caffeinated\Themes\ThemeFactory
+     */
+    protected $themes;
+
+    /**
+     * @var \Illuminate\Contracts\Config\Repository
+     */
+    protected $config;
 
     /** Instantiates the class
      *
-     * @param \Laradic\Themes\Contracts\ThemeFactory $themes
+     * @param \Illuminate\Contracts\Container\Container   $container
+     * @param \Illuminate\Contracts\Filesystem\Filesystem $files
+     * @param \Illuminate\Contracts\Routing\UrlGenerator  $url
+     * @param \Illuminate\Contracts\Config\Repository     $config
+     * @internal param \Caffeinated\Themes\Contracts\ThemeFactory|\Laradic\Themes\Contracts\ThemeFactory $themes
      */
-    public function __construct(ThemeFactory $themes, Filesystem $files, UrlGenerator $url)
+    public function __construct(Container $container, Filesystem $files, UrlGenerator $url, Config $config)
     {
-        $this->themes = $themes;
-        $this->files = $files;
-        $this->url = $url;
+        $this->container       = $container;
+        $this->files           = $files;
+        $this->url             = $url;
+        $this->config          = $config;
+        $this->assetClass      = $this->config->get('caffeinated.bonsai.asset_class');
+        $this->assetGroupClass = $this->config->get('caffeinated.bonsai.asset_group_class');
+
+        $this->setCachePath(public_path($this->config->get('caffeinated.bonsai.cache_path')));
+
+        $this->html = $container->make('html');
+
+        if ($this->hasThemes = $container->bound('caffeinated.themes')) {
+            $this->themes = $container->make('caffeinated.themes');
+        }
     }
 
     /**
@@ -67,18 +108,35 @@ class Bonsai implements BonsaiContract
      * @param string $handle       The ID/key for this asset
      * @param string $path         File location path
      * @param array  $dependencies Optional dependencies
-     * @return \Laradic\Themes\Assets\Asset
+     * @return Asset
      */
     public function make($handle, $path, array $dependencies = [ ])
     {
-        $asset   = new $this->assetClass($handle, $this->getPath($path), $dependencies);
+        /**
+         * @var Asset $asset
+         */
+        $asset   = new $this->assetClass($handle, $this->resolvePath($path), $dependencies);
         $filters = $this->getGlobalFilters($asset->getExt());
-        foreach ( $filters as $filter )
-        {
+        foreach ($filters as $filter) {
             $asset->ensureFilter($filter);
         }
 
         return $asset;
+    }
+
+    /**
+     * resolvePath
+     *
+     * @param $path
+     * @return string
+     */
+    public function resolvePath($path)
+    {
+        if ($this->hasThemes) {
+            return $this->themes->assetPath($path);
+        }
+
+        return $path;
     }
 
     /**
@@ -89,7 +147,7 @@ class Bonsai implements BonsaiContract
      */
     public function url($assetPath = '')
     {
-        return $this->toUrl($this->getPath($assetPath));
+        return $this->url->to($this->resolvePath($assetPath));
     }
 
     /**
@@ -100,7 +158,7 @@ class Bonsai implements BonsaiContract
      */
     public function uri($assetPath = '')
     {
-        return $this->relativePath($this->getPath($assetPath));
+        return $this->url->to($this->resolvePath($assetPath));
     }
 
     /**
@@ -129,17 +187,21 @@ class Bonsai implements BonsaiContract
         return app('html')->style($this->url($assetPath), $attr, $secure);
     }
 
+    /**
+     * addGlobalFilter
+     *
+     * @param $extension
+     * @param $callback
+     * @return $this
+     */
     public function addGlobalFilter($extension, $callback)
     {
-        if ( is_string($callback) )
-        {
-            $callback = function () use ($callback)
-            {
+        if (is_string($callback)) {
+            $callback = function () use ($callback) {
+            
                 return new $callback;
             };
-        }
-        elseif ( ! $callback instanceof \Closure )
-        {
+        } elseif (! $callback instanceof \Closure) {
             throw new \InvalidArgumentException('Callback is not a closure or reference string.');
         }
         $this->globalFilters[ $extension ][] = $callback;
@@ -147,15 +209,19 @@ class Bonsai implements BonsaiContract
         return $this;
     }
 
+    /**
+     * getGlobalFilters
+     *
+     * @param $extension
+     * @return array
+     */
     public function getGlobalFilters($extension)
     {
         $filters = array();
-        if ( ! isset($this->globalFilters[ $extension ]) )
-        {
+        if (! isset($this->globalFilters[ $extension ])) {
             return array();
         }
-        foreach ( $this->globalFilters[ $extension ] as $cb )
-        {
+        foreach ($this->globalFilters[ $extension ] as $cb) {
             $filters[] = $cb();
         }
 
@@ -171,99 +237,15 @@ class Bonsai implements BonsaiContract
      */
     public function group($name)
     {
-        if ( isset($this->assetGroups[ $name ]) )
-        {
+        if (isset($this->assetGroups[ $name ])) {
             return $this->assetGroups[ $name ];
-        }
-        else
-        {
+        } else {
             $this->assetGroups[ $name ] = new $this->assetGroupClass($this, $name);
 
             return $this->assetGroups[ $name ];
         }
     }
 
-    /**
-     * getPath
-     *
-     * @param null $key
-     * @return string
-     */
-    public function getPath($key = null)
-    {
-        list($section, $relativePath, $extension) = with(new NamespacedItemResolver)->parseKey($key);
-        if ( $key === null )
-        {
-            return $this->toUrl($this->themes->getActive()->getPath('assets'));
-        }
-        if ( $relativePath === null or strlen($relativePath) === 0 )
-        {
-            if ( array_key_exists($section, View::getFinder()->getHints()) )
-            {
-                return $this->toUrl($this->themes->getActive()->getCascadedPath('namespaces', $section, 'assets'));
-            }
-
-            return $this->toUrl($this->themes->getActive()->getCascadedPath('packages', $section, 'assets'));
-        }
-        if ( isset($section) )
-        {
-            if ( array_key_exists($section, View::getFinder()->getHints()) )
-            {
-                $paths = $this->themes->getCascadedPaths('namespaces', $section, 'assets');
-            }
-            else
-            {
-                $paths = $this->themes->getCascadedPaths('packages', $section, 'assets');
-            }
-        }
-        else
-        {
-            $paths = $this->themes->getCascadedPaths(null, null, 'assets');
-        }
-        foreach ( $paths as $path )
-        {
-            $file = rtrim($path, '/') . '/' . $relativePath . '.' . $extension;
-            if ( File::exists($file) )
-            {
-                return $file;
-            }
-        }
-
-        return $file;
-    }
-
-    /**
-     * relativePath
-     *
-     * @param $path
-     * @return string
-     */
-    protected function relativePath($path)
-    {
-        $path = Str::create($path)->removeLeft(public_path());
-        if ( $path->endsWith('.') )
-        {
-            $path = $path->removeRight('.');
-        }
-
-        return (string)$path;
-    }
-
-    /**
-     * toUrl
-     *
-     * @param $path
-     * @return string
-     */
-    protected function toUrl($path)
-    {
-        if ( Str::startsWith($path, public_path(), true) )
-        {
-            $path = $this->relativePath($path);
-        }
-
-        return $this->url->to($path);
-    }
 
 
 
@@ -273,7 +255,7 @@ class Bonsai implements BonsaiContract
     /**
      * getThemes
      *
-     * @return \Laradic\Themes\Contracts\ThemeFactory|\Laradic\Themes\ThemeFactory
+     * @return \Caffeinated\Themes\ThemeFactory
      */
     public function getThemes()
     {
@@ -304,10 +286,13 @@ class Bonsai implements BonsaiContract
      * Set the cachePath value
      *
      * @param string $cachePath
-     * @return AssetFactory
+     * @return Factory
      */
     public function setCachePath($cachePath)
     {
+        if (! $this->files->exists($cachePath)) {
+            $this->files->makeDirectory($cachePath);
+        }
         $this->cachePath = $cachePath;
 
         return $this;
@@ -317,7 +302,7 @@ class Bonsai implements BonsaiContract
      * Set the assetClass value
      *
      * @param string $assetClass
-     * @return AssetFactory
+     * @return Factory
      */
     public function setAssetClass($assetClass)
     {
@@ -330,12 +315,42 @@ class Bonsai implements BonsaiContract
      * Set the assetGroupClass value
      *
      * @param string $assetGroupClass
-     * @return AssetFactory
+     * @return Factory
      */
     public function setAssetGroupClass($assetGroupClass)
     {
         $this->assetGroupClass = $assetGroupClass;
 
         return $this;
+    }
+
+    /**
+     * get container value
+     *
+     * @return Container
+     */
+    public function getContainer()
+    {
+        return $this->container;
+    }
+
+    /**
+     * get html value
+     *
+     * @return \Collective\Html\HtmlBuilder
+     */
+    public function getHtml()
+    {
+        return $this->html;
+    }
+
+    /**
+     * is hasThemes value
+     *
+     * @return boolean
+     */
+    public function isHasThemes()
+    {
+        return $this->hasThemes;
     }
 }

@@ -1,8 +1,8 @@
 <?php
 /**
-* Part of the Caffeinated PHP packages.
-*
-* MIT License and copyright information bundled with this package in the LICENSE file
+ * Part of the Caffeinated PHP packages.
+ *
+ * MIT License and copyright information bundled with this package in the LICENSE file
  */
 namespace Caffeinated\Bonsai;
 
@@ -18,13 +18,53 @@ use Caffeinated\Beverage\ServiceProvider;
  */
 class BonsaiServiceProvider extends ServiceProvider
 {
+    /**
+     * @var string
+     */
     protected $dir = __DIR__;
 
-    protected $provides = [ 'bonsai' ];
+    /**
+     * @var array
+     */
+    protected $configFiles = [ 'caffeinated.bonsai' ];
 
-    protected $bindings = [
-        'bonsai' => \Caffeinated\Bonsai\Bonsai::class
+    /**
+     * @var array
+     */
+    protected $providers = [
+        \Caffeinated\Beverage\BeverageServiceProvider::class,
+        Providers\ConsoleServiceProvider::class,
+        \Collective\Html\HtmlServiceProvider::class
     ];
 
+    /**
+     * @var array
+     */
+    protected $provides = [ 'caffeinated.bonsai' ];
 
+    /**
+     * @var array
+     */
+    protected $singletons = [
+        'caffeinated.bonsai' => Factory::class
+    ];
+
+    /**
+     * @var array
+     */
+    protected $aliases = [
+        'caffeinated.bonsai' => Contracts\Factory::class
+    ];
+
+    public function register()
+    {
+        $a = 'a';
+        return parent::register();
+    }
+
+    public function boot()
+    {
+        return parent::boot();
+        $b = 'a';
+    }
 }

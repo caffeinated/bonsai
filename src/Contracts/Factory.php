@@ -14,6 +14,6 @@ namespace Caffeinated\Bonsai\Contracts;
  * @copyright      Copyright (c) 2015, Caffeinated
  * @license        https://tldrlegal.com/license/mit-license MIT License
  */
-interface Bonsai
+interface Factory
 {
 }
