@@ -23,9 +23,9 @@ class AssetCollection extends \Assetic\Asset\AssetCollection
     {
         $key = '';
         foreach ($this->all() as $asset) {
-        if (!$asset instanceof Asset) {
+            if (!$asset instanceof Asset) {
                 continue;
-        }
+            }
             $key .= $asset->getCacheKey();
         }
         return 'col_'.$key;
