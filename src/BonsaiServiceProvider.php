@@ -39,7 +39,7 @@ class BonsaiServiceProvider extends ServiceProvider
 	 */
 	protected function registerServices()
 	{
-		$this->app->bindShared('bonsai', function($app) {
+		$this->app->singleton('bonsai', function($app) {
 			return new Bonsai($app['view']);
 		});
 	}
