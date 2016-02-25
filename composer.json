@@ -11,19 +11,11 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "illuminate/support": "5.1.*"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "4.*"
+        "illuminate/support": "5.1.*|5.2.*"
     },
     "autoload": {
         "psr-4": {
-            "Caffeinated\\Bonsai\\": "src/Caffeinated/Bonsai/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Caffeinated\\Bonsai\\Tests\\": "tests/"
+            "Caffeinated\\Bonsai\\": "src"
         }
     }
 }
