@@ -3,28 +3,28 @@ namespace Caffeinated\Bonsai;
 
 class Node
 {
-	/**
-	 * @var string
-	 */
-	public $name;
+    /**
+     * @var string
+     */
+    public $name;
 
-	/**
-	 * @var array
-	 */
-	public $children = array();
+    /**
+     * @var array
+     */
+    public $children = array();
 
-	/**
-	 * @var array
-	 */
-	public $parents = array();
+    /**
+     * @var array
+     */
+    public $parents = array();
 
-	/**
-	 * Constructor method.
-	 *
-	 * @param  string  $name
-	 */
-	public function __construct($name = '')
-	{
-		$this->name = $name;
-	}
+    /**
+     * Constructor method.
+     *
+     * @param  string  $name
+     */
+    public function __construct($name = '')
+    {
+        $this->name = $name;
+    }
 }

@@ -6,298 +6,298 @@ use Illuminate\Support\Collection;
 
 class Assets
 {
-	/**
-	 * Regex pattern to match CSS/JS assets.
-	 *
-	 * @var string
-	 */
-	protected $assetRegex = '/.\.(css|js)$/i';
+    /**
+     * Regex pattern to match CSS/JS assets.
+     *
+     * @var string
+     */
+    protected $assetRegex = '/.\.(css|js)$/i';
 
-	/**
-	 * Regex pattern to match CSS assets.
-	 *
-	 * @var string
-	 */
-	protected $cssRegex = '/.\.css$/i';
+    /**
+     * Regex pattern to match CSS assets.
+     *
+     * @var string
+     */
+    protected $cssRegex = '/.\.css$/i';
 
-	/**
-	 * Regex pattern to match JS assets.
-	 *
-	 * @var string
-	 */
-	protected $jsRegex = '/.\.js$/i';
+    /**
+     * Regex pattern to match JS assets.
+     *
+     * @var string
+     */
+    protected $jsRegex = '/.\.js$/i';
 
-	/**
-	 * Regex pattern to match Bonsai json files.
-	 *
-	 * @var string
-	 */
-	protected $bonsaiRegex = '/bonsai\.json$/i';
+    /**
+     * Regex pattern to match Bonsai json files.
+     *
+     * @var string
+     */
+    protected $bonsaiRegex = '/bonsai\.json$/i';
 
-	/**
-	 * @var Illuminate\Support\Collection
-	 */
-	protected $collection;
+    /**
+     * @var Illuminate\Support\Collection
+     */
+    protected $collection;
 
-	/**
-	 * @var string
-	 */
-	protected $lastAddedAsset = '';
+    /**
+     * @var string
+     */
+    protected $lastAddedAsset = '';
 
-	/**
-	 * @var string
-	 */
-	protected $lastAddedType = '';
+    /**
+     * @var string
+     */
+    protected $lastAddedType = '';
 
-	/**
-	 * Constructor method.
-	 *
-	 * @return null
-	 */
-	public function __construct()
-	{
-		$this->collection = new Collection(['css' => array(), 'js' => array()]);
-	}
+    /**
+     * Constructor method.
+     *
+     * @return null
+     */
+    public function __construct()
+    {
+        $this->collection = new Collection(['css' => array(), 'js' => array()]);
+    }
 
-	/**
-	 * Add a new asset to the Bonsai collection.
-	 *
-	 * @return Asset
-	 */
-	public function add($assets, $namespace = null)
-	{
-		if (is_array($assets)) {
-			foreach ($assets as $asset) {
-				$this->add($asset, $namespace);
-			}
-		} elseif ($this->isAsset($assets)) {
-			$this->addAsset($assets, $namespace);
-		} elseif ($this->isBonsai($assets)) {
-			$this->parseBonsai($assets);
-		}
+    /**
+     * Add a new asset to the Bonsai collection.
+     *
+     * @return Asset
+     */
+    public function add($assets, $namespace = null)
+    {
+        if (is_array($assets)) {
+            foreach ($assets as $asset) {
+                $this->add($asset, $namespace);
+            }
+        } elseif ($this->isAsset($assets)) {
+            $this->addAsset($assets, $namespace);
+        } elseif ($this->isBonsai($assets)) {
+            $this->parseBonsai($assets);
+        }
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Add a dependency to an asset.
-	 *
-	 * @return Asset
-	 */
-	public function dependsOn($dependency)
-	{
-		$collection = $this->collection->get($this->lastAddedType);
+    /**
+     * Add a dependency to an asset.
+     *
+     * @return Asset
+     */
+    public function dependsOn($dependency)
+    {
+        $collection = $this->collection->get($this->lastAddedType);
 
-		foreach ($collection as $path => $item) {
-			if ($path === $this->lastAddedAsset) {
-				$collection[$path] = array(
-					'namespace'  => $item['namespace'],
-					'dependency' => $dependency
-				);
+        foreach ($collection as $path => $item) {
+            if ($path === $this->lastAddedAsset) {
+                $collection[$path] = array(
+                    'namespace'  => $item['namespace'],
+                    'dependency' => $dependency
+                );
 
-				$this->collection->put($this->lastAddedType, $collection);
-			}
-		}
+                $this->collection->put($this->lastAddedType, $collection);
+            }
+        }
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Builds the CSS HTML tags.
-	 *
-	 * @return Closure|string
-	 */
-	public function css()
-	{
-		$cssCollection = $this->sortDependencies($this->collection->get('css'), 'css');
-		$output        = '';
+    /**
+     * Builds the CSS HTML tags.
+     *
+     * @return Closure|string
+     */
+    public function css()
+    {
+        $cssCollection = $this->sortDependencies($this->collection->get('css'), 'css');
+        $output        = '';
 
-		foreach ($cssCollection as $key => $value) {
-			$output .= '<link rel="stylesheet" href="'.$value.'">'."\n";
-		}
+        foreach ($cssCollection as $key => $value) {
+            $output .= '<link rel="stylesheet" href="'.$value.'">'."\n";
+        }
 
-		return $output;
-	}
+        return $output;
+    }
 
-	/**
-	 * Builds the CSS HTML tags.
-	 *
-	 * @return Closure|string
-	 */
-	public function js()
-	{
-		$jsCollection = $this->sortDependencies($this->collection->get('js'), 'js');
-		$output       = '';
+    /**
+     * Builds the CSS HTML tags.
+     *
+     * @return Closure|string
+     */
+    public function js()
+    {
+        $jsCollection = $this->sortDependencies($this->collection->get('js'), 'js');
+        $output       = '';
 
-		foreach ($jsCollection as $key => $value) {
-			$output .= '<script type="text/javascript" src="'.$value.'"></script>'."\n";
-		}
+        foreach ($jsCollection as $key => $value) {
+            $output .= '<script type="text/javascript" src="'.$value.'"></script>'."\n";
+        }
 
-		return $output;
-	}
+        return $output;
+    }
 
-	/**
-	 * Determines if the passed asset is indeed an asset.
-	 *
-	 * @param  string  $asset
-	 * @return bool
-	 */
-	protected function isAsset($asset)
-	{
-		return preg_match($this->assetRegex, $asset);
-	}
+    /**
+     * Determines if the passed asset is indeed an asset.
+     *
+     * @param  string  $asset
+     * @return bool
+     */
+    protected function isAsset($asset)
+    {
+        return preg_match($this->assetRegex, $asset);
+    }
 
-	/**
-	 * Determines if the passed asset is a Javascript file.
-	 *
-	 * @param  string  $asset
-	 * @return bool
-	 */
-	protected function isJs($asset)
-	{
-		return preg_match($this->jsRegex, $asset);
-	}
+    /**
+     * Determines if the passed asset is a Javascript file.
+     *
+     * @param  string  $asset
+     * @return bool
+     */
+    protected function isJs($asset)
+    {
+        return preg_match($this->jsRegex, $asset);
+    }
 
-	/**
-	 * Determines if the passed asset is a CSS file.
-	 *
-	 * @param  string  $asset
-	 * @return bool
-	 */
-	protected function isCss($asset)
-	{
-		return preg_match($this->cssRegex, $asset);
-	}
+    /**
+     * Determines if the passed asset is a CSS file.
+     *
+     * @param  string  $asset
+     * @return bool
+     */
+    protected function isCss($asset)
+    {
+        return preg_match($this->cssRegex, $asset);
+    }
 
-	/**
-	 * Determines if the passed asset is a Bonsai JSON file.
-	 *
-	 * @param  string  $asset
-	 * @return bool
-	 */
-	protected function isBonsai($asset)
-	{
-		return preg_match($this->bonsaiRegex, $asset);
-	}
+    /**
+     * Determines if the passed asset is a Bonsai JSON file.
+     *
+     * @param  string  $asset
+     * @return bool
+     */
+    protected function isBonsai($asset)
+    {
+        return preg_match($this->bonsaiRegex, $asset);
+    }
 
-	/**
-	 * Add an asset file to the collection.
-	 *
-	 * @param  array|string  $assets
-	 * @return Assets
-	 */
-	protected function addAsset($assets, $namespace = null)
-	{
-		if (is_array($assets)) {
-			foreach ($assets as $asset => $meta) {
-				$this->addAsset($asset);
-			}
+    /**
+     * Add an asset file to the collection.
+     *
+     * @param  array|string  $assets
+     * @return Assets
+     */
+    protected function addAsset($assets, $namespace = null)
+    {
+        if (is_array($assets)) {
+            foreach ($assets as $asset => $meta) {
+                $this->addAsset($asset);
+            }
 
-			return $this;
-		}
+            return $this;
+        }
 
-		$type       = ($this->isCss($assets)) ? 'css' : 'js';
-		$collection = $this->collection->get($type);
+        $type       = ($this->isCss($assets)) ? 'css' : 'js';
+        $collection = $this->collection->get($type);
 
-		if (! in_array($assets, $collection)) {
-			$collection[$assets] = array(
-				'namespace'  => $namespace,
-				'dependency' => array()
-			);
+        if (! in_array($assets, $collection)) {
+            $collection[$assets] = array(
+                'namespace'  => $namespace,
+                'dependency' => array()
+            );
 
-			$this->collection->put($type, $collection);
+            $this->collection->put($type, $collection);
 
-			$this->lastAddedType  = $type;
-			$this->lastAddedAsset = $assets;
-		}
+            $this->lastAddedType  = $type;
+            $this->lastAddedAsset = $assets;
+        }
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Parse a bonsai.json file and add the assets to the collection.
-	 *
-	 * @param  string  $path
-	 * @return Assets
-	 */
-	protected function parseBonsai($path)
-	{
-		$file   = file_get_contents($path);
-		$assets = json_decode($file, true);
+    /**
+     * Parse a bonsai.json file and add the assets to the collection.
+     *
+     * @param  string  $path
+     * @return Assets
+     */
+    protected function parseBonsai($path)
+    {
+        $file   = file_get_contents($path);
+        $assets = json_decode($file, true);
 
-		foreach ($assets as $path => $meta) {
-			$namespace = (isset($meta['namespace'])) ? $meta['namespace'] : null;
+        foreach ($assets as $path => $meta) {
+            $namespace = (isset($meta['namespace'])) ? $meta['namespace'] : null;
 
-			$asset = $this->addAsset($path, $namespace);
+            $asset = $this->addAsset($path, $namespace);
 
-			if (isset($meta['dependency'])) {
-				$asset->dependsOn($meta['dependency']);
-			}
-		}
+            if (isset($meta['dependency'])) {
+                $asset->dependsOn($meta['dependency']);
+            }
+        }
 
-		return;
-	}
+        return;
+    }
 
-	/**
-	 * Sorts the dependencies of all assets, to ensure dependant
-	 * assets are loaded first.
-	 *
-	 * @param  array  $assets
-	 * @return array
-	 */
-	protected function sortDependencies($assets = array(), $type)
-	{
-		$dependencyList = array();
+    /**
+     * Sorts the dependencies of all assets, to ensure dependant
+     * assets are loaded first.
+     *
+     * @param  array  $assets
+     * @return array
+     */
+    protected function sortDependencies($assets = array(), $type)
+    {
+        $dependencyList = array();
 
-		foreach ($assets as $key => $value) {
-			if (isset($value['dependency'])) {
-				$dependencyList[$key] = array($this->getNamespacedAsset($value['dependency'], $type));
-			} else {
-				$dependencyList[$key] = null;
-			}
-		}
+        foreach ($assets as $key => $value) {
+            if (isset($value['dependency'])) {
+                $dependencyList[$key] = array($this->getNamespacedAsset($value['dependency'], $type));
+            } else {
+                $dependencyList[$key] = null;
+            }
+        }
 
-		$dependencies = new Dependencies($dependencyList, true);
+        $dependencies = new Dependencies($dependencyList, true);
 
-		$sortedDependencies = $dependencies->sort();
+        $sortedDependencies = $dependencies->sort();
 
-		return array_filter($sortedDependencies);
-	}
+        return array_filter($sortedDependencies);
+    }
 
-	/**
-	 * Checks if the array has any circular references within
-	 * itself. This can be used to prevent any infinite loops
-	 * from sprouting up unknowingly.
-	 *
-	 * @param  array  $array
-	 * @return bool
-	 */
-	protected function hasCircularReferences($array)
-	{
-		foreach ($array as $key => $value) {
-			if (isset($array[$value]) and ($array[$value] == $key)) {
-				return true;
-			}
-		}
+    /**
+     * Checks if the array has any circular references within
+     * itself. This can be used to prevent any infinite loops
+     * from sprouting up unknowingly.
+     *
+     * @param  array  $array
+     * @return bool
+     */
+    protected function hasCircularReferences($array)
+    {
+        foreach ($array as $key => $value) {
+            if (isset($array[$value]) and ($array[$value] == $key)) {
+                return true;
+            }
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	/**
-	 * Retrievs the asset based on the defined namespace.
-	 *
-	 * @param  string  $namespace
-	 * @param  string  $type       (css|js)
-	 * @return string
-	 */
-	protected function getNamespacedAsset($namespace, $type)
-	{
-		$collection = $this->collection->get($type);
+    /**
+     * Retrievs the asset based on the defined namespace.
+     *
+     * @param  string  $namespace
+     * @param  string  $type       (css|js)
+     * @return string
+     */
+    protected function getNamespacedAsset($namespace, $type)
+    {
+        $collection = $this->collection->get($type);
 
-		foreach ($collection as $key => $value) {
-			if ($value['namespace'] === $namespace) {
-				return $key;
-			}
-		}
-	}
+        foreach ($collection as $key => $value) {
+            if ($value['namespace'] === $namespace) {
+                return $key;
+            }
+        }
+    }
 }
