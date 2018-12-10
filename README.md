@@ -1,93 +1,35 @@
-Caffeinated Bonsai
-====================
-[![Laravel 5](https://img.shields.io/badge/Laravel-5-orange.svg?style=flat-square)](http://laravel.com)
-[![Source](http://img.shields.io/badge/source-caffeinated/bonsai-blue.svg?style=flat-square)](https://github.com/caffeinated/bonsai)
-[![License](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://tldrlegal.com/license/mit-license)
+# Caffeinated Bonsai
+[![Source](https://img.shields.io/badge/source-caffeinated/bonsai-blue.svg?style=flat-square)](https://github.com/caffeinated/bonsai)
+[![Latest Stable Version](https://poser.pugx.org/caffeinated/bonsai/v/stable?format=flat-square)](https://packagist.org/packages/caffeinated/bonsai)
+[![License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://tldrlegal.com/license/mit-license)
+[![Total Downloads](https://img.shields.io/packagist/dt/caffeinated/bonsai.svg?style=flat-square)](https://packagist.org/packages/caffeinated/bonsai)
 
 **Bonsai** (盆栽, lit. *plantings in tray*, from *bon*, a tray or low-sided pot and *sai*, a planting or plantings, is a Japanese art form using miniature trees grown in containers.
 
-Caffeinated Bonsai is an experimental project to handle and process assets for any Laravel 5 application - much like [CodeSleeve's Asset Pipeline](https://github.com/CodeSleeve/asset-pipeline) package provided for Laravel 4 (which is now deprecated due to Laravel Elixer in Laravel 5).
+Bonsai gives you the ability to register assets to be loaded at runtime within your Laravel projects.
 
-The package follows the FIG standards PSR-1, PSR-2, and PSR-4 to ensure a high level of interoperability between shared PHP code. At the moment the package is not unit tested, but is planned to be covered later down the road.
+## Documentation
+You will find user friendly and updated documentation on the [Caffeinated website](https://caffeinatedpackages.com/guide/packages/bonsai.html).
 
-Quick Installation
-------------------
-Begin by installing the package through Composer.
+## Installation
+Simply install the package through Composer. From here the package will automatically register its service provider and `Bonsai` facade.
 
 ```
 composer require caffeinated/bonsai
 ```
 
-Once this operation is complete, simply add both the service provider and facade classes to your project's `config/app.php` file:
+## Changelog
+You will find a complete changelog history within the [CHANGELOG](CHANGELOG.md) file.
 
-#### Service Provider
-```php
-Caffeinated\Bonsai\BonsaiServiceProvider::class,
-```
+## Contributing
+Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
-#### Facade
-```php
-'Bonsai' => Caffeinated\Bonsai\Facades\Bonsai::class,
-```
+## Security
+If you discover any security related issues, please email shea.lewis89@gmail.com directly instead of using the issue tracker.
 
-And that's it! With your coffee in reach, start planting some assets!
+## Credits
+- [Shea Lewis](https://github.com/kaidesu)
+- [All Contributors](../../contributors)
 
-Documentation
--------------
-First, plant your bonsai. You may optionally register assets during this time as well.
-
-```php
-Bonsai::plant(function($asset) {
-	$asset->add('assets/css/bootstrap.css', 'bootstrap');
-	$asset->add('assets/css/test.css')->dependsOn('bootstrap');
-	$asset->add('assets/css/bootstrap.css', 'bootstrap');                // Duplicate assets will be caught and ignored.
-	$asset->add('assets/js/jquery.js', 'jquery');
-	$asset->add('assets/js/bootstrap.js', 'bootstrap')->dependsOn('jquery');
-});
-```
-
-Now, to add assets at anytime (and anywhere in your code), simply call `Bonsai:add()`:
-
-```php
-Bonsai::add('assets/css/example.css');
-```
-
-### Defining Dependencies
-Assets may depend on other assets being loaded before them. You can easily tell Bonsai about any dependencies your asset files may have against each other by using the `dependsOn()` method.
-
-```php
-Bonsai::add('assets/css/example.css')->dependsOn('bootstrap');
-Bonsai::add('assets/css/bootstrap.css', 'bootstrap');
-```
-
-The above will generate the following CSS:
-
-```html
-<link rel="stylesheet" href="assets/css/bootstrap.css">
-<link rel="stylesheet" href="assets/css/example.css">
-```
-
-### Rendering Assets
-To echo out your assets within your layout, simply use the `css()` and `js()` methods:
-
-#### Blade
-
-```html
-{!! $bonsai->css() !!}
-
-{!! $bonsai->js() !!}
-```
-
-#### Twig
-
-```html
-{{ bonsai.css()|raw }}
-
-{{ bonsai.js()|raw }}
-```
-
-TODO
-----
-- ~~Check for dependencies (`dependsOn()` method) and load dependencies first, in order when rendering within a view.~~
-- Combine and minify assets into one cached file when in the production environment.
-- ~~Add the ability to parse a bonsai.json file for assets that can be registered for use.~~
+## License
+The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
