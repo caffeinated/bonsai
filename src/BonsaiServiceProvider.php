@@ -1,6 +1,8 @@
 <?php
 namespace Caffeinated\Bonsai;
 
+use Exception;
+use Caffeinated\Bonsai\Facades\Bonsai;
 use Illuminate\Support\ServiceProvider;
 
 class BonsaiServiceProvider extends ServiceProvider
@@ -19,7 +21,20 @@ class BonsaiServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        Blade::directive('bonsai', function($assetType) {
+            switch($assetType) {
+                case 'css':
+                    return "<?php echo Bonsai::css(); ?>";
+                    break;
+
+                case 'js':
+                return "<?php echo Bonsai::js(); ?>";
+                    break;
+
+                default:
+                    throw new Exception('Invalid asset type declared. Must be either "css" or "js".');
+            }
+        });
     }
 
     /**
