@@ -3,7 +3,7 @@ namespace Caffeinated\Bonsai;
 
 use Exception;
 use Illuminate\Support\Facades\Blade;
-use Caffeinated\Bonsai\Facades\Bonsai;
+// use Caffeinated\Bonsai\Facades\Bonsai;
 use Illuminate\Support\ServiceProvider;
 
 class BonsaiServiceProvider extends ServiceProvider
@@ -24,12 +24,12 @@ class BonsaiServiceProvider extends ServiceProvider
     {
         Blade::directive('bonsai', function($assetType) {
             switch($assetType) {
-                case 'css':
-                    return "<?php echo Bonsai::css(); ?>";
+                case "'css'":
+                    return "<?php echo Bonsai::get()->css(); ?>";
                     break;
 
-                case 'js':
-                return "<?php echo Bonsai::js(); ?>";
+                case "'js'":
+                return "<?php echo Bonsai::get()->js(); ?>";
                     break;
 
                 default:
