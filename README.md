@@ -22,7 +22,7 @@ composer require caffeinated/bonsai
 You will find a complete changelog history within the [CHANGELOG](CHANGELOG.md) file.
 
 ## Contributing
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
+Please see [Contributing](https://caffeinatedpackages.com/guide/contributing.html) on our website for details.
 
 ## Security
 If you discover any security related issues, please email shea.lewis89@gmail.com directly instead of using the issue tracker.
