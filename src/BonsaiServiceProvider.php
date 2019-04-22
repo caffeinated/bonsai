@@ -3,7 +3,6 @@ namespace Caffeinated\Bonsai;
 
 use Exception;
 use Illuminate\Support\Facades\Blade;
-// use Caffeinated\Bonsai\Facades\Bonsai;
 use Illuminate\Support\ServiceProvider;
 
 class BonsaiServiceProvider extends ServiceProvider
