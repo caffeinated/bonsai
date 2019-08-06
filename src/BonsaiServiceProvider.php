@@ -44,16 +44,6 @@ class BonsaiServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->registerServices();
-    }
-
-    /**
-     * Register the package services.
-     *
-     * @return void
-     */
-    protected function registerServices()
-    {
         $this->app->singleton('bonsai', function ($app) {
             return new Bonsai($app['view']);
         });
@@ -66,6 +56,6 @@ class BonsaiServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return ['bonsai'];
+        return [Bonsai::class];
     }
 }
