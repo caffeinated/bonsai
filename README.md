@@ -6,7 +6,7 @@
 
 **Bonsai** (盆栽, lit. *plantings in tray*, from *bon*, a tray or low-sided pot and *sai*, a planting or plantings, is a Japanese art form using miniature trees grown in containers.
 
-Bonsai gives you the ability to register assets to be loaded at runtime within your Laravel projects.
+Bonsai gives you the ability to register assets to be loaded at runtime within your Laravel projects. Originally developed for [FusionCMS](https://github.com/fusioncms/fusioncms), an open source content management system.
 
 ## Documentation
 You will find user friendly and updated documentation on the [Caffeinated website](https://caffeinatedpackages.com/guide/packages/bonsai.html).
