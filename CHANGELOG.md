@@ -6,6 +6,16 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.0.0] - 2020-04-02
+### Added
+- Laravel 7 support
+
+### Changed
+- PHP 7.2 is now the minimum supported version
+
+### Removed
+- Laravel 5 support
+
 ## [4.2.0] - 2019-08-06
 ### Added
 - Laravel 6.x support
