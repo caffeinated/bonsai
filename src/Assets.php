@@ -6,26 +6,6 @@ use Illuminate\Support\Collection;
 
 class Assets
 {
-    /**
-     * Regex pattern to match CSS/JS assets.
-     *
-     * @var string
-     */
-    protected $assetRegex = '/.\.(css|js)$/i';
-
-    /**
-     * Regex pattern to match CSS assets.
-     *
-     * @var string
-     */
-    protected $cssRegex = '/.\.css$/i';
-
-    /**
-     * Regex pattern to match JS assets.
-     *
-     * @var string
-     */
-    protected $jsRegex = '/.\.js$/i';
 
     /**
      * Regex pattern to match Bonsai json files.
@@ -144,7 +124,7 @@ class Assets
      */
     protected function isAsset($asset)
     {
-        return preg_match($this->assetRegex, $asset);
+        return $this->isJs($asset) || $this->isCss($asset);
     }
 
     /**
@@ -155,7 +135,7 @@ class Assets
      */
     protected function isJs($asset)
     {
-        return preg_match($this->jsRegex, $asset);
+        return stripos($asset, '.js') !== false;
     }
 
     /**
@@ -166,7 +146,7 @@ class Assets
      */
     protected function isCss($asset)
     {
-        return preg_match($this->cssRegex, $asset);
+        return stripos($asset, '.css') !== false;
     }
 
     /**
