@@ -8,13 +8,6 @@ class Assets
 {
 
     /**
-     * Regex pattern to match Bonsai json files.
-     *
-     * @var string
-     */
-    protected $bonsaiRegex = '/bonsai\.json$/i';
-
-    /**
      * @var Illuminate\Support\Collection
      */
     protected $collection;
@@ -50,10 +43,10 @@ class Assets
             foreach ($assets as $asset) {
                 $this->add($asset, $namespace);
             }
-        } elseif ($this->isAsset($assets)) {
-            $this->addAsset($assets, $namespace);
         } elseif ($this->isBonsai($assets)) {
             $this->parseBonsai($assets);
+        } elseif ($this->isAsset($assets)) {
+            $this->addAsset($assets, $namespace);
         }
 
         return $this;
@@ -93,7 +86,7 @@ class Assets
         $output        = '';
 
         foreach ($cssCollection as $key => $value) {
-            $output .= '<link rel="stylesheet" href="'.$value.'">'."\n";
+            $output .= '<link rel="stylesheet" href="/'.$value.'">'."\n";
         }
 
         return $output;
@@ -110,7 +103,7 @@ class Assets
         $output       = '';
 
         foreach ($jsCollection as $key => $value) {
-            $output .= '<script type="text/javascript" src="'.$value.'"></script>'."\n";
+            $output .= '<script type="text/javascript" src="/'.$value.'"></script>'."\n";
         }
 
         return $output;
@@ -157,7 +150,7 @@ class Assets
      */
     protected function isBonsai($asset)
     {
-        return preg_match($this->bonsaiRegex, $asset);
+        return preg_match('/bonsai\.json$/i', $asset);
     }
 
     /**

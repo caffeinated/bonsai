@@ -21,16 +21,15 @@ class BonsaiServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Blade::directive('bonsai', function($assetType) {
-            switch($assetType) {
-                case "'css'":
+        Blade::directive('bonsai', function($expression) {
+            eval("\$params = [$expression];");
+            switch($params[0]) {
+                case "add":
+                    return "<?php Bonsai::get()->add('$params[1]'".(isset($params[2])&&!empty($params[2])?",'$params[2]'":'').")".(isset($params[3])&&!empty($params[3])?"->dependsOn('$params[3]')":'')."; ?>";
+                case "css":
                     return "<?php echo Bonsai::get()->css(); ?>";
-                    break;
-
-                case "'js'":
-                return "<?php echo Bonsai::get()->js(); ?>";
-                    break;
-
+                case "js":
+                    return "<?php echo Bonsai::get()->js(); ?>";
                 default:
                     throw new Exception('Invalid asset type declared. Must be either "css" or "js".');
             }
