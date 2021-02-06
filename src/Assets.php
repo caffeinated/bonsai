@@ -86,7 +86,7 @@ class Assets
         $output        = '';
 
         foreach ($cssCollection as $key => $value) {
-            $output .= '<link rel="stylesheet" href="/'.$value.'">'."\n";
+            $output .= '<link rel="stylesheet" href="'.$value.'">'."\n";
         }
 
         return $output;
@@ -103,7 +103,7 @@ class Assets
         $output       = '';
 
         foreach ($jsCollection as $key => $value) {
-            $output .= '<script type="text/javascript" src="/'.$value.'"></script>'."\n";
+            $output .= '<script type="text/javascript" src="'.$value.'"></script>'."\n";
         }
 
         return $output;
