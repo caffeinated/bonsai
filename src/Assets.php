@@ -218,7 +218,7 @@ class Assets
      * @param  array  $assets
      * @return array
      */
-    protected function sortDependencies($assets = array(), $type)
+    protected function sortDependencies($assets = array(), $type = null)
     {
         $dependencyList = array();
 
