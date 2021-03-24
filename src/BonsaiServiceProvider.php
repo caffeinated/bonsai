@@ -25,12 +25,8 @@ class BonsaiServiceProvider extends ServiceProvider
             switch($assetType) {
                 case "'css'":
                     return "<?php echo Bonsai::get()->css(); ?>";
-                    break;
-
                 case "'js'":
-                return "<?php echo Bonsai::get()->js(); ?>";
-                    break;
-
+                    return "<?php echo Bonsai::get()->js(); ?>";
                 default:
                     throw new Exception('Invalid asset type declared. Must be either "css" or "js".');
             }
