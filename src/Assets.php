@@ -29,7 +29,7 @@ class Assets
      */
     public function __construct()
     {
-        $this->collection = new Collection(['css' => array(), 'js' => array()]);
+        $this->collection = new Collection(['css' => [], 'js' => []]);
     }
 
     /**
@@ -62,13 +62,13 @@ class Assets
         $collection = $this->collection->get($this->lastAddedType);
 
         foreach ($collection as $path => $item) {
-            if ($path === $this->lastAddedAsset) {
-                $collection[$path] = array(
-                    'namespace'  => $item['namespace'],
+            if (self::cleanAsset($path) === $this->lastAddedAsset) {
+                $collection[$path] = array_merge($item, [
                     'dependency' => $dependency
-                );
+                ]);
 
                 $this->collection->put($this->lastAddedType, $collection);
+                break;
             }
         }
 
@@ -171,20 +171,43 @@ class Assets
 
         $type       = ($this->isCss($assets)) ? 'css' : 'js';
         $collection = $this->collection->get($type);
+        $cleanAsset = self::cleanAsset($assets);
+        $existingAssets = array_map(function ($asset) {
+            return self::cleanAsset($asset);
+        }, array_keys($collection));
 
-        if (! in_array($assets, $collection)) {
+        if (! in_array($cleanAsset, $existingAssets)) {
             $collection[$assets] = array(
                 'namespace'  => $namespace,
                 'dependency' => array()
             );
 
             $this->collection->put($type, $collection);
-
-            $this->lastAddedType  = $type;
-            $this->lastAddedAsset = $assets;
         }
 
+        $this->lastAddedType  = $type;
+        $this->lastAddedAsset = $cleanAsset;
+
         return $this;
+    }
+
+    /**
+     * Remove `?` anf `#` parts from asset
+     *
+     * @param  string  $asset
+     * @return string
+     */
+    private static function cleanAsset($asset)
+    {
+        $asset = (string) $asset;
+
+        $result = strstr($asset, '?', true);
+        $asset = $result === false ? $asset : $result;
+
+        $result = strstr($asset, '#', true);
+        $asset = $result === false ? $asset : $result;
+
+        return $asset;
     }
 
     /**
