@@ -33,32 +33,16 @@ class Assets
     }
 
     /**
-     * Add a new asset to the Bonsai collection.
-     *
-     * @return Asset
-     */
-    public function add($assets, $namespace = null)
-    {
-        if (is_array($assets)) {
-            foreach ($assets as $asset) {
-                $this->add($asset, $namespace);
-            }
-        } elseif ($this->isBonsai($assets)) {
-            $this->parseBonsai($assets);
-        } elseif ($this->isAsset($assets)) {
-            $this->addAsset($assets, $namespace);
-        }
-
-        return $this;
-    }
-
-    /**
      * Add a dependency to an asset.
      *
      * @return Asset
      */
     public function dependsOn($dependency)
     {
+        if (! $dependency || ! $this->lastAddedAsset) {
+            return $this;
+        }
+
         $collection = $this->collection->get($this->lastAddedType);
 
         foreach ($collection as $path => $item) {
@@ -82,7 +66,7 @@ class Assets
      */
     public function css()
     {
-        $cssCollection = $this->sortDependencies($this->collection->get('css'), 'css');
+        $cssCollection = $this->sortDependencies('css');
         $output        = '';
 
         foreach ($cssCollection as $key => $value) {
@@ -99,7 +83,7 @@ class Assets
      */
     public function js()
     {
-        $jsCollection = $this->sortDependencies($this->collection->get('js'), 'js');
+        $jsCollection = $this->sortDependencies('js');
         $output       = '';
 
         foreach ($jsCollection as $key => $value) {
@@ -128,7 +112,7 @@ class Assets
      */
     protected function isJs($asset)
     {
-        return stripos($asset, '.js') !== false;
+        return is_string($asset) && stripos($asset, '.js') !== false;
     }
 
     /**
@@ -139,7 +123,7 @@ class Assets
      */
     protected function isCss($asset)
     {
-        return stripos($asset, '.css') !== false;
+        return is_string($asset) && stripos($asset, '.css') !== false;
     }
 
     /**
@@ -150,7 +134,7 @@ class Assets
      */
     protected function isBonsai($asset)
     {
-        return preg_match('/bonsai\.json$/i', $asset);
+        return is_array($asset) || (is_string($asset) && preg_match('/bonsai\.json$/i', $asset));
     }
 
     /**
@@ -159,23 +143,24 @@ class Assets
      * @param  array|string  $assets
      * @return Assets
      */
-    protected function addAsset($assets, $namespace = null)
+    public function add($assets, $namespace = null)
     {
-        if (is_array($assets)) {
-            foreach ($assets as $asset => $meta) {
-                $this->addAsset($asset);
-            }
+        if ($this->isBonsai($assets)) {
+            return $this->parseBonsai($assets);
+        }
+
+        if (! $this->isAsset($assets)) {
+            $this->lastAddedAsset = '';
 
             return $this;
         }
 
-        $type       = ($this->isCss($assets)) ? 'css' : 'js';
+        $type       = $this->isCss($assets) ? 'css' : 'js';
         $collection = $this->collection->get($type);
 
         if (! in_array($assets, $collection)) {
             $collection[$assets] = array(
-                'namespace'  => $namespace,
-                'dependency' => array()
+                'namespace'  => $namespace
             );
 
             $this->collection->put($type, $collection);
@@ -190,44 +175,43 @@ class Assets
     /**
      * Parse a bonsai.json file and add the assets to the collection.
      *
-     * @param  string  $path
+     * @param  string|array  $assets
      * @return Assets
      */
-    protected function parseBonsai($path)
+    protected function parseBonsai($assets)
     {
-        $file   = file_get_contents($path);
-        $assets = json_decode($file, true);
-
-        foreach ($assets as $path => $meta) {
-            $namespace = (isset($meta['namespace'])) ? $meta['namespace'] : null;
-
-            $asset = $this->addAsset($path, $namespace);
-
-            if (isset($meta['dependency'])) {
-                $asset->dependsOn($meta['dependency']);
-            }
+        if (is_string($assets)) {
+            $file   = file_get_contents($assets);
+            $assets = json_decode($file, true) ?: [];
         }
 
-        return;
+        foreach ($assets as $path => $meta) {
+            $path = is_numeric($path) ? $meta : $path;
+            $meta = is_array($meta) ? $meta : [];
+
+            $this->add($path, $meta['namespace'] ?? null)
+                ->dependsOn($meta['dependency'] ?? null);
+        }
+
+        return $this;
     }
 
     /**
      * Sorts the dependencies of all assets, to ensure dependant
      * assets are loaded first.
      *
-     * @param  array  $assets
+     * @param  string  $type
      * @return array
      */
-    protected function sortDependencies($assets = array(), $type = null)
+    protected function sortDependencies($type)
     {
+        $assets = $this->collection->get($type);
         $dependencyList = array();
 
         foreach ($assets as $key => $value) {
-            if (isset($value['dependency'])) {
-                $dependencyList[$key] = array($this->getNamespacedAsset($value['dependency'], $type));
-            } else {
-                $dependencyList[$key] = null;
-            }
+            $dependencyList[$key] = [
+                isset($value['dependency']) ? $this->getNamespacedAsset($value['dependency'], $type) : null
+            ];
         }
 
         $dependencies = new Dependencies($dependencyList, true);
@@ -268,7 +252,7 @@ class Assets
         $collection = $this->collection->get($type);
 
         foreach ($collection as $key => $value) {
-            if ($value['namespace'] === $namespace) {
+            if (($value['namespace'] ?? null) === $namespace) {
                 return $key;
             }
         }
