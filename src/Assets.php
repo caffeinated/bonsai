@@ -8,7 +8,7 @@ class Assets
 {
 
     /**
-     * @var Illuminate\Support\Collection
+     * @var \Illuminate\Support\Collection
      */
     protected $collection;
 
@@ -25,7 +25,7 @@ class Assets
     /**
      * Constructor method.
      *
-     * @return null
+     * @return void
      */
     public function __construct()
     {
@@ -55,7 +55,7 @@ class Assets
     /**
      * Add a dependency to an asset.
      *
-     * @return Asset
+     * @return \Caffeinated\Bonsai\Assets
      */
     public function dependsOn($dependency)
     {
@@ -78,7 +78,7 @@ class Assets
     /**
      * Builds the CSS HTML tags.
      *
-     * @return Closure|string
+     * @return string
      */
     public function css()
     {
@@ -95,7 +95,7 @@ class Assets
     /**
      * Builds the CSS HTML tags.
      *
-     * @return Closure|string
+     * @return string
      */
     public function js()
     {
@@ -157,7 +157,8 @@ class Assets
      * Add an asset file to the collection.
      *
      * @param  array|string  $assets
-     * @return Assets
+     * @param  null|string   $namespace
+     * @return \Caffeinated\Bonsai\Assets
      */
     protected function addAsset($assets, $namespace = null)
     {
@@ -191,7 +192,7 @@ class Assets
      * Parse a bonsai.json file and add the assets to the collection.
      *
      * @param  string  $path
-     * @return Assets
+     * @return \Caffeinated\Bonsai\Assets
      */
     protected function parseBonsai($path)
     {
