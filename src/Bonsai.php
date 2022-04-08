@@ -7,7 +7,7 @@ use Illuminate\View\Factory;
 class Bonsai
 {
     /**
-     * @var Illuminate\Support\Collection
+     * @var \Illuminate\Support\Collection
      */
     protected $collection;
 
@@ -32,7 +32,7 @@ class Bonsai
      *
      * @param  string  $namespace
      * @param  string  $path
-     * @return null
+     * @return \Caffeinated\Bonsai\Assets
      */
     public function plant($callback = null)
     {
@@ -52,7 +52,7 @@ class Bonsai
     /**
      * Get and return the bonsai collection.
      *
-     * @return mixed
+     * @return \Caffeinated\Bonsai\Assets|null
      */
     public function get()
     {
@@ -63,7 +63,7 @@ class Bonsai
      * Add assets to a pre-planted Bonsai collection.
      *
      * @param  array|string  $assets
-     * @return mixed
+     * @return \Caffeinated\Bonsai\Assets|void
      */
     public function add($assets)
     {
